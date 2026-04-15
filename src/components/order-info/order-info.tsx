@@ -1,10 +1,9 @@
-import { FC, useMemo, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Preloader } from '../ui/preloader';
-import { OrderInfoUI } from '../ui/order-info';
-import { TIngredient } from '@utils-types';
 import { useDispatch, useSelector } from '../../services/store';
 import { getOrderByNumberApi } from '../../utils/burger-api';
+import { OrderInfoUI } from '../ui/order-info';
+import { Preloader } from '../ui/preloader';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams<{ number: string }>();
@@ -14,9 +13,13 @@ export const OrderInfo: FC = () => {
 
   useEffect(() => {
     if (number) {
-      getOrderByNumberApi(Number(number)).then((res) => {
-        setOrderData(res.orders[0]);
-      });
+      getOrderByNumberApi(Number(number))
+        .then((res) => {
+          setOrderData(res.orders[0]);
+        })
+        .catch((err) => {
+          console.error('Ошибка загрузки заказа:', err);
+        });
     }
   }, [number]);
 
