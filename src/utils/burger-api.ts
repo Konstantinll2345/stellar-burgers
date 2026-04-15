@@ -1,7 +1,7 @@
 import { setCookie, getCookie } from './cookie';
 import { TIngredient, TOrder, TOrdersData, TUser } from './types';
 
-const URL = process.env.BURGER_API_URL;
+const URL = process.env.REACT_APP_BURGER_API_URL;
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
@@ -33,6 +33,10 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
       localStorage.setItem('refreshToken', refreshData.refreshToken);
       setCookie('accessToken', refreshData.accessToken);
       return refreshData;
+    })
+    .catch((err) => {
+      console.error('Ошибка обновления токена:', err);
+      return Promise.reject(err);
     });
 
 export const fetchWithRefresh = async <T>(
@@ -77,6 +81,10 @@ export const getIngredientsApi = () =>
     .then((data) => {
       if (data?.success) return data.data;
       return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка загрузки ингредиентов:', err);
+      return Promise.reject(err);
     });
 
 export const getFeedsApi = () =>
@@ -85,6 +93,10 @@ export const getFeedsApi = () =>
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка загрузки ленты заказов:', err);
+      return Promise.reject(err);
     });
 
 export const getOrdersApi = () =>
@@ -94,10 +106,15 @@ export const getOrdersApi = () =>
       'Content-Type': 'application/json;charset=utf-8',
       authorization: getCookie('accessToken')
     } as HeadersInit
-  }).then((data) => {
-    if (data?.success) return data.orders;
-    return Promise.reject(data);
-  });
+  })
+    .then((data) => {
+      if (data?.success) return data.orders;
+      return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка загрузки заказов пользователя:', err);
+      return Promise.reject(err);
+    });
 
 type TOwner = {
   name: string;
@@ -132,10 +149,15 @@ export const orderBurgerApi = (data: string[]) =>
     body: JSON.stringify({
       ingredients: data
     })
-  }).then((data) => {
-    if (data?.success) return data;
-    return Promise.reject(data);
-  });
+  })
+    .then((data) => {
+      if (data?.success) return data;
+      return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка создания заказа:', err);
+      return Promise.reject(err);
+    });
 
 type TOrderResponse = TServerResponse<{
   orders: TOrder[];
@@ -147,7 +169,12 @@ export const getOrderByNumberApi = (number: number) =>
     headers: {
       'Content-Type': 'application/json'
     }
-  }).then((res) => checkResponse<TOrderResponse>(res));
+  })
+    .then((res) => checkResponse<TOrderResponse>(res))
+    .catch((err) => {
+      console.error('Ошибка получения заказа по номеру:', err);
+      return Promise.reject(err);
+    });
 
 export type TRegisterData = {
   email: string;
@@ -173,6 +200,10 @@ export const registerUserApi = (data: TRegisterData) =>
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка регистрации:', err);
+      return Promise.reject(err);
     });
 
 export type TLoginData = {
@@ -192,6 +223,10 @@ export const loginUserApi = (data: TLoginData) =>
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка входа:', err);
+      return Promise.reject(err);
     });
 
 export const forgotPasswordApi = (data: { email: string }) =>
@@ -206,6 +241,10 @@ export const forgotPasswordApi = (data: { email: string }) =>
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка восстановления пароля:', err);
+      return Promise.reject(err);
     });
 
 export const resetPasswordApi = (data: { password: string; token: string }) =>
@@ -220,6 +259,10 @@ export const resetPasswordApi = (data: { password: string; token: string }) =>
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
+    })
+    .catch((err) => {
+      console.error('Ошибка сброса пароля:', err);
+      return Promise.reject(err);
     });
 
 type TUserResponse = TServerResponse<{ user: TUser }>;
@@ -229,6 +272,9 @@ export const getUserApi = () =>
     headers: {
       authorization: getCookie('accessToken')
     } as HeadersInit
+  }).catch((err) => {
+    console.error('Ошибка получения пользователя:', err);
+    return Promise.reject(err);
   });
 
 export const updateUserApi = (user: Partial<TRegisterData>) =>
@@ -239,6 +285,9 @@ export const updateUserApi = (user: Partial<TRegisterData>) =>
       authorization: getCookie('accessToken')
     } as HeadersInit,
     body: JSON.stringify(user)
+  }).catch((err) => {
+    console.error('Ошибка обновления пользователя:', err);
+    return Promise.reject(err);
   });
 
 export const logoutApi = () =>
@@ -250,4 +299,9 @@ export const logoutApi = () =>
     body: JSON.stringify({
       token: localStorage.getItem('refreshToken')
     })
-  }).then((res) => checkResponse<TServerResponse<{}>>(res));
+  })
+    .then((res) => checkResponse<TServerResponse<{}>>(res))
+    .catch((err) => {
+      console.error('Ошибка выхода:', err);
+      return Promise.reject(err);
+    });
