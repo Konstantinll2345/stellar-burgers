@@ -1,8 +1,14 @@
 describe('страница конструктора бургера', () => {
   beforeEach(() => {
-    cy.intercept('GET', '**/api/ingredients', { fixture: 'ingredients.json' }).as('ingredients');
-    cy.intercept('GET', '**/api/auth/user', { fixture: 'user.json' }).as('checkUser');
-    cy.intercept('POST', '**/api/orders', { fixture: 'order.json' }).as('createOrder');
+    cy.intercept('GET', '**/api/ingredients', {
+      fixture: 'ingredients.json'
+    }).as('ingredients');
+    cy.intercept('GET', '**/api/auth/user', { fixture: 'user.json' }).as(
+      'checkUser'
+    );
+    cy.intercept('POST', '**/api/orders', { fixture: 'order.json' }).as(
+      'createOrder'
+    );
     cy.setCookie('accessToken', 'mockAccessToken');
     window.localStorage.setItem('refreshToken', 'mockRefreshToken');
     cy.visit('/');
@@ -10,10 +16,7 @@ describe('страница конструктора бургера', () => {
   });
 
   it('добавляет булку и начинку в конструктор', () => {
-    cy.contains('Краторная булка N-200i')
-      .parents('li')
-      .find('button')
-      .click();
+    cy.contains('Краторная булка N-200i').parents('li').find('button').click();
     cy.get('[data-test="constructor-container"]')
       .contains('Краторная булка N-200i (верх)')
       .should('be.visible');
@@ -42,10 +45,7 @@ describe('страница конструктора бургера', () => {
   });
 
   it('собирает бургер и оформляет заказ', () => {
-    cy.contains('Краторная булка N-200i')
-      .parents('li')
-      .find('button')
-      .click();
+    cy.contains('Краторная булка N-200i').parents('li').find('button').click();
     cy.contains('Биокотлета из марсианской Магнолии')
       .parents('li')
       .find('button')

@@ -62,7 +62,10 @@ describe('burgerConstructorSlice', () => {
       { ...sauce, id: '2', name: 'Sauce2' }
     ];
     const initialState = { bun: null, ingredients: items };
-    const state = reducer(initialState, moveIngredient({ index: 1, direction: 'up' }));
+    const state = reducer(
+      initialState,
+      moveIngredient({ index: 1, direction: 'up' })
+    );
     expect(state.ingredients[0].id).toBe('2');
     expect(state.ingredients[1].id).toBe('1');
   });
