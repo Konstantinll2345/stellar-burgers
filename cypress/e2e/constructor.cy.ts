@@ -1,22 +1,32 @@
 describe('страница конструктора бургера', () => {
   beforeEach(() => {
-    cy.intercept('GET', '**/api/ingredients', {
+    cy.intercept('GET', 'https://norma.education-services.ru/api/ingredients', {
       fixture: 'ingredients.json'
     }).as('ingredients');
-    cy.intercept('GET', '**/api/auth/user', { fixture: 'user.json' }).as(
-      'checkUser'
-    );
-    cy.intercept('POST', '**/api/orders', { fixture: 'order.json' }).as(
-      'createOrder'
-    );
+    cy.intercept('GET', 'https://norma.education-services.ru/api/auth/user', {
+      fixture: 'user.json'
+    }).as('checkUser');
+    cy.intercept('POST', 'https://norma.education-services.ru/api/orders', {
+      fixture: 'order.json'
+    }).as('createOrder');
+
     cy.setCookie('accessToken', 'mockAccessToken');
     window.localStorage.setItem('refreshToken', 'mockRefreshToken');
+
     cy.visit('/');
     cy.wait('@ingredients');
   });
 
+  afterEach(() => {
+    cy.clearCookie('accessToken');
+    window.localStorage.removeItem('refreshToken');
+  });
+
   it('добавляет булку и начинку в конструктор', () => {
-    cy.contains('Краторная булка N-200i').parents('li').find('button').click();
+    cy.contains('Краторная булка N-200i')
+      .parents('li')
+      .find('button')
+      .click();
     cy.get('[data-test="constructor-container"]')
       .contains('Краторная булка N-200i (верх)')
       .should('be.visible');
@@ -33,7 +43,10 @@ describe('страница конструктора бургера', () => {
   it('открывает модальное окно ингредиента и закрывает его (крестик и оверлей)', () => {
     cy.contains('Соус традиционный галактический').click();
     cy.get('[data-test="modal"]').should('exist');
-    cy.contains('Детали ингредиента');
+
+    cy.get('[data-test="modal"]')
+      .contains('Соус традиционный галактический')
+      .should('exist');
 
     cy.get('[data-test="modal-close-btn"]').click();
     cy.get('[data-test="modal"]').should('not.exist');
@@ -45,7 +58,10 @@ describe('страница конструктора бургера', () => {
   });
 
   it('собирает бургер и оформляет заказ', () => {
-    cy.contains('Краторная булка N-200i').parents('li').find('button').click();
+    cy.contains('Краторная булка N-200i')
+      .parents('li')
+      .find('button')
+      .click();
     cy.contains('Биокотлета из марсианской Магнолии')
       .parents('li')
       .find('button')
